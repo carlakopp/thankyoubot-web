@@ -24,6 +24,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ThankyouFormComponent } from './thankyou-form/thankyou-form.component';
+import { SearchModule } from './search';
 
 @NgModule({
   declarations: [AppComponent, ThankyouFormComponent],
@@ -44,6 +45,7 @@ import { ThankyouFormComponent } from './thankyou-form/thankyou-form.component';
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
+    SearchModule,
   ],
   providers: [],
   entryComponents: [ThankyouFormComponent],

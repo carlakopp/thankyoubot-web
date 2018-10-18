@@ -20,7 +20,6 @@ import {
   group,
 } from '@angular/animations';
 
-import { MainActions } from '../actions';
 import { ThankyouFormComponent } from './thankyou-form/thankyou-form.component';
 import { ThankYouModel } from '../models';
 import { Subscription, interval } from 'rxjs';
@@ -35,39 +34,50 @@ import { Subscription, interval } from 'rxjs';
     <div id="navi">
         <mat-toolbar color="primary">
           <span>Latest Thank You Messages</span>
-
           <span class="exampleFillRemainingSpace"></span>
           <span>
             <mat-icon class="addThankYou" (click)="openDialog()">library_add_new</mat-icon>
           </span>
         </mat-toolbar>
+            <br><br>
+            <search (filter)="onSearch($event)" (clear)="onClear()" type="Thank Yous">
+            </search>
             <mat-list>
-                <mat-list-item  *ngFor="let thankYou of thankYous | async; let i = index;">
-                    <mat-icon mat-list-icon>star</mat-icon>
-                    <h4 mat-line>&quot;{{ thankYou.original }}&quot;</h4>
-                    <p mat-line> {{ thankYou.submitter.replace('.', ' ') | titlecase }}</p>
+              <ng-template [ngIf]="loadAll">
+                <mat-list-item *ngFor="let thankYou of thankYouArray; let i = index;">
+                  <mat-icon mat-list-icon>star</mat-icon>
+                  <h4 mat-line>&quot;{{ thankYou.original }}&quot;</h4>
+                  <p mat-line> {{ thankYou.submitter.replace('.', ' ') | titlecase }}</p>
                 </mat-list-item>
+              </ng-template>
+              <ng-template [ngIf]="!loadAll">
+                <mat-list-item *ngFor="let thankYou of newThankYouArray; let i = index;">
+                  <mat-icon mat-list-icon>star</mat-icon>
+                  <h4 mat-line>&quot;{{ thankYou.original }}&quot;</h4>
+                  <p mat-line> {{ thankYou.submitter.replace('.', ' ') | titlecase }}</p>
+                </mat-list-item>
+              </ng-template>
             </mat-list>
 
+        <ng-template [ngIf]="loaded">
+          <mat-toolbar color="primary">
+            <span>Thank You Statistics</span>
+            <span class="example-fill-remaining-space"></span>
+          </mat-toolbar>
 
-      <mat-toolbar color="primary">
-        <span>Thank You Statistics</span>
-
-        <span class="example-fill-remaining-space"></span>
-      </mat-toolbar>
-
-      <h4 mat-line>Total Thank Yous:</h4>{{ (thankYous | async).length }}
-      <h4 mat-line>Random Thank You:</h4>
-      <button raised color="accent" (click)="getRandom()">Get Random Thank You</button>
-      <ng-template [ngIf]="showRandom">
-        <mat-list>
-          <mat-list-item>
-              <mat-icon mat-list-icon>stars</mat-icon>
-              <h4 mat-line>&quot;{{ randomThankYou.original }}&quot;</h4>
-              <p mat-line> {{ randomThankYou.submitter.replace('.', ' ') | titlecase }}</p>
-          </mat-list-item>
-        </mat-list>
-      </ng-template>
+          <h4 mat-line>Total Thank Yous:</h4>{{ (thankYous | async).length }}
+          <h4 mat-line>Random Thank You:</h4>
+          <button raised color="accent" (click)="getRandom()">Get Random Thank You</button>
+          <ng-template [ngIf]="showRandom">
+            <mat-list>
+              <mat-list-item>
+                  <mat-icon mat-list-icon>stars</mat-icon>
+                  <h4 mat-line>&quot;{{ randomThankYou.original }}&quot;</h4>
+                  <p mat-line> {{ randomThankYou.submitter.replace('.', ' ') | titlecase }}</p>
+              </mat-list-item>
+            </mat-list>
+          </ng-template>
+        </ng-template>
       </div>
     </div>
 
@@ -135,27 +145,17 @@ import { Subscription, interval } from 'rxjs';
 export class AppComponent implements AfterViewInit, OnDestroy {
   public thankYouList: AngularFireList<any>;
   public thankYous: Observable<ThankYouModel[]>;
-  public thankYouArray: ThankYouModel[];
+  public thankYouArray: ThankYouModel[] = [];
+  public newThankYouArray: ThankYouModel[] = [];
   public randomThankYou: ThankYouModel;
   public showRandom = false;
+  public loaded = false;
+  public loadAll = true;
   thankYou: string;
   name: string;
   takeOff = false;
-  birds = [
-    'flappy-bird.gif',
-    'Animate-bird-slide-25.gif',
-    '3HOL.gif',
-    'bird-grump.gif',
-    'crow.gif',
-    'derp-yellow.gif',
-    'dragon.gif',
-    'flappy-2.gif',
-    'giphy.gif',
-    'pegasus.gif',
-    'seagull.gif',
-    't-bird.gif',
-  ];
-  photoUrl = './assets/' + this.birds[Math.floor(Math.random() * this.birds.length)];
+  birds = ['./assets/flappy-bird.gif', './assets/Animate-bird-slide-25.gif'];
+  photoUrl = this.birds[Math.floor(Math.random() * this.birds.length)];
   // photoUrl = './assets/flappy-bird.gif';
   interval: Subscription;
 
@@ -170,8 +170,10 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     this.thankYous = this.thankYouList.valueChanges();
     // MainActions.createLoadSuccessAction(this.thankYous);
     this.thankYous.subscribe(thankYous => {
-      return (this.thankYouArray = thankYous);
+      this.thankYouArray = thankYous;
+      return this.thankYouArray.reverse();
     });
+    this.loaded = true;
   }
 
   toggle() {
@@ -200,7 +202,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
       submitter,
       original,
     });
-    //this.takeOff = false;
+    // this.takeOff = false;
   }
 
   getRandom() {
@@ -208,6 +210,20 @@ export class AppComponent implements AfterViewInit, OnDestroy {
       Math.floor(Math.random() * this.thankYouArray.length)
     ];
     this.showRandom = true;
+  }
+  onSearch(term) {
+    this.newThankYouArray = this.thankYouArray.filter(
+      thankYou =>
+        thankYou.original.toLowerCase().includes(term.toLowerCase()) ||
+        thankYou.submitter.toLowerCase().includes(term.toLowerCase()),
+    );
+    this.loadAll = false;
+    if (term === '') {
+      this.onClear();
+    }
+  }
+  onClear() {
+    this.loadAll = true;
   }
 }
 

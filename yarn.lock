@@ -386,6 +386,22 @@
   version "0.2.8"
   resolved "https://registry.yarnpkg.com/@firebase/webchannel-wrapper/-/webchannel-wrapper-0.2.8.tgz#38a936b60b898a1ad0f3719543ff1a1031f60f8b"
 
+"@ngrx/effects@^6.1.0":
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/@ngrx/effects/-/effects-6.1.0.tgz#3c1e1ab1e5a86c6d9c29d4f3771e42cc9bd8576c"
+
+"@ngrx/entity@^6.1.0":
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/@ngrx/entity/-/entity-6.1.0.tgz#9ea34beef25e458b45638095875b2548d484df9f"
+
+"@ngrx/schematics@^6.1.0":
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/@ngrx/schematics/-/schematics-6.1.0.tgz#4e784da5502829700895ca87d4cc5da93bf3ec84"
+
+"@ngrx/store@^6.1.0":
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/@ngrx/store/-/store-6.1.0.tgz#5b027647a797bf027912568214b10375dd75af38"
+
 "@ngtools/webpack@6.2.1":
   version "6.2.1"
   resolved "https://registry.yarnpkg.com/@ngtools/webpack/-/webpack-6.2.1.tgz#a74839d626b997c7fba0147f5a6107d5aa14b063"
