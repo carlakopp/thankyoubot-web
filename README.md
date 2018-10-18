@@ -1,1 +1,1 @@
-# thankyoubot-web
+# thankyoubot

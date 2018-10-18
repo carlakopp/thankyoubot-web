@@ -1,0 +1,23 @@
+@import '~material-design-icons/iconfont/material-icons.css';
+
+html {
+  height: 100%;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  height: 100%;
+  padding-top: 64px;
+  color: var(--color-foreground-text);
+  background-color: var(--color-background-background);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.cdk-overlay-container {
+  z-index: 1005;
+}
