@@ -77,6 +77,19 @@ import { Subscription, interval } from 'rxjs';
               </mat-list-item>
             </mat-list>
           </ng-template>
+
+          <h4 mat-line>Top 5 Most Thankful:</h4>
+
+          <ng-template [ngIf]="showThankful">
+            <mat-list>
+              <mat-list-item *ngFor="let thankYou of thankfulObject; let i = index;">
+                <mat-icon mat-list-icon>stars</mat-icon>
+                <h4 mat-line>{{ thankYou.name  | titlecase}} has given {{ thankYou.number }} thank yous!</h4>
+              </mat-list-item>
+            </mat-list>
+          </ng-template>
+
+          <button raised color="accent" (click)="onGetThankful()">Get Top 5 Thankful People</button>
         </ng-template>
       </div>
     </div>
@@ -148,9 +161,11 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   public thankYouArray: ThankYouModel[] = [];
   public newThankYouArray: ThankYouModel[] = [];
   public randomThankYou: ThankYouModel;
+  public thankfulObject: { name: string; number: number }[] = [];
   public showRandom = false;
   public loaded = false;
   public loadAll = true;
+  public showThankful = false;
   thankYou: string;
   name: string;
   takeOff = false;
@@ -224,6 +239,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     ];
     this.showRandom = true;
   }
+
   onSearch(term) {
     this.newThankYouArray = this.thankYouArray.filter(
       thankYou =>
@@ -235,6 +251,65 @@ export class AppComponent implements AfterViewInit, OnDestroy {
       this.onClear();
     }
   }
+
+  onGetThankful() {
+    const people = this.thankYouArray.map(thankYou => {
+      if (thankYou.submitter.indexOf('and') > 0) {
+        return thankYou.submitter
+          .toLowerCase()
+          .replace(/\s/g, '')
+          .split('and');
+      }
+      return thankYou.submitter
+        .toLowerCase()
+        .split(' ')[0]
+        .split('.')[0];
+    });
+    const peopleArray: string[] = [].concat.apply([], people);
+    const peopleSet = new Set(peopleArray);
+    let thanks = {};
+    for (var i = 0; i < peopleArray.length; i++) {
+      if (this.hasProp(thanks, peopleArray[i])) {
+        thanks[peopleArray[i]]++;
+      } else {
+        thanks[peopleArray[i]] = 1;
+      }
+    }
+
+    for (var i = 0; i < (peopleSet as any).length; i++) {
+      if (this.hasProp(thanks, peopleArray[i])) {
+        thanks[peopleArray[i]]++;
+      } else {
+        thanks[peopleArray[i]] = 0;
+      }
+    }
+
+    var sortable = [];
+    for (var vehicle in thanks) {
+      sortable.push([vehicle, thanks[vehicle]]);
+    }
+
+    sortable.sort(function(a, b) {
+      return b[1] - a[1];
+    });
+
+    // This cuts it to top 5, but it's alphabetical so someone might tie and be left off the list
+    sortable = sortable.slice(0, 5);
+
+    this.thankfulObject = sortable.map(function(x) {
+      return {
+        name: x[0],
+        number: x[1],
+      };
+    });
+
+    this.showThankful = true;
+  }
+
+  hasProp(obj, prop) {
+    return Object.prototype.hasOwnProperty.call(obj, prop);
+  }
+
   onClear() {
     this.loadAll = true;
   }
